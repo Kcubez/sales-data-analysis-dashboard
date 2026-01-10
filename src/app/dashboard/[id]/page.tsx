@@ -9,6 +9,7 @@ import {
   Loader2,
   LayoutGrid,
   Trash2,
+  RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { KpiCards } from '@/components/dashboard/KpiCards';
 import { FilterPanel } from '@/components/dashboard/FilterPanel';
 import { ChartContainer } from '@/components/dashboard/ChartContainer';
-import { CsvTable } from '@/components/csv/CsvTable';
+import { EditableTable } from '@/components/csv/EditableTable';
 import { useLanguage } from '@/context/LanguageContext';
 import { Filter } from '@/types/filter';
 import { ColumnInfo, CsvData } from '@/types/csv';
@@ -78,6 +79,19 @@ export default function DatasetDashboardPage() {
       fetchDataset();
     }
   }, [datasetId, router]);
+
+  // Refresh data function - called after CRUD operations
+  const refreshData = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/datasets/${datasetId}`);
+      const result = await response.json();
+      if (result.success) {
+        setDataset(result.dataset);
+      }
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+    }
+  }, [datasetId]);
 
   // Convert dataset rows to CSV data format
   const csvData: CsvData | null = useMemo(() => {
@@ -318,7 +332,13 @@ export default function DatasetDashboardPage() {
               <CardTitle className="text-lg">Data Table</CardTitle>
             </CardHeader>
             <CardContent>
-              <CsvTable data={filteredData} columns={csvData.columns} />
+              <EditableTable
+                data={csvData.rows}
+                columns={csvData.columns}
+                datasetId={datasetId}
+                rowIds={dataset.rows.map(r => r.id)}
+                onDataChange={refreshData}
+              />
             </CardContent>
           </Card>
         </TabsContent>
