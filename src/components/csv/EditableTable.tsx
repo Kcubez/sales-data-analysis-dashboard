@@ -253,7 +253,7 @@ export function EditableTable({
               <Input
                 value={editValue}
                 onChange={e => setEditValue(e.target.value)}
-                className="h-8 w-full min-w-[100px]"
+                className="h-8 w-full min-w-25"
                 autoFocus
                 onKeyDown={e => {
                   if (e.key === 'Enter') saveEdit();
@@ -396,7 +396,7 @@ export function EditableTable({
             Add Row
           </Button>
           <Select value={String(pageSize)} onValueChange={v => setPageSize(Number(v))}>
-            <SelectTrigger className="w-[100px]">
+            <SelectTrigger className="w-25">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

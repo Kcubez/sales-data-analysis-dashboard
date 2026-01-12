@@ -74,12 +74,14 @@ export default function LoginPage() {
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="you@example.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   className="pl-10"
                   required
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -90,6 +92,7 @@ export default function LoginPage() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="password"
+                  name="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={password}
@@ -97,6 +100,7 @@ export default function LoginPage() {
                   className="pl-10 pr-10"
                   required
                   minLength={6}
+                  autoComplete={isLogin ? 'current-password' : 'new-password'}
                 />
                 <button
                   type="button"
