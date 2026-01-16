@@ -167,7 +167,7 @@ export default function DashboardPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-100 mb-4">
             <BarChart3 className="h-8 w-8 text-violet-600" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Welcome to Sales Dashboard</h1>
+          <h1 className="text-2xl font-bold mb-2">Welcome to Genius Board</h1>
           <p className="text-muted-foreground">Upload your sales data to get started</p>
         </div>
 

@@ -109,7 +109,7 @@ export default function LoginPage() {
             <LayoutDashboard className="h-8 w-8 text-white" />
           </div>
           <CardTitle className="text-2xl font-bold bg-linear-to-br from-violet-600 to-purple-600 bg-clip-text text-transparent">
-            Sales Dashboard
+            Genius Board
           </CardTitle>
           <CardDescription>Sign in to your account</CardDescription>
         </CardHeader>
