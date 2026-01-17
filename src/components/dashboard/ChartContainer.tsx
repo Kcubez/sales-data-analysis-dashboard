@@ -464,35 +464,6 @@ export function ChartContainer({ data, columns }: ChartContainerProps) {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-
-        {/* Summary Table */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Top 10 {groupByColumn}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {chartData.slice(0, 10).map((item, index) => (
-                <div
-                  key={item.name}
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                    />
-                    <span className="text-sm font-medium truncate max-w-37.5">{item.name}</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    {formatNumber(item.value, showCurrency ? 'currency' : 'number')}
-                    {showCurrency ? ' Ks' : ''}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

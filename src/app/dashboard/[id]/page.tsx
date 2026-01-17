@@ -11,11 +11,19 @@ import {
   Trash2,
   RefreshCw,
   Sparkles,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { KpiCards } from '@/components/dashboard/KpiCards';
 import { FilterPanel } from '@/components/dashboard/FilterPanel';
 import { ChartContainer } from '@/components/dashboard/ChartContainer';
@@ -57,6 +65,8 @@ export default function DatasetDashboardPage() {
   const [priorityColumn, setPriorityColumn] = useState<string | null>(null);
   const [showDataCleaner, setShowDataCleaner] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Fetch dataset from Supabase
   useEffect(() => {
@@ -224,9 +234,8 @@ export default function DatasetDashboardPage() {
   }, [csvData, filteredData, t]);
 
   // Delete dataset handler
-  const handleDelete = useCallback(async () => {
-    if (!confirm('Are you sure you want to delete this dataset?')) return;
-
+  const confirmDelete = useCallback(async () => {
+    setIsDeleting(true);
     try {
       const response = await fetch(`/api/datasets/${datasetId}`, { method: 'DELETE' });
       const result = await response.json();
@@ -240,6 +249,9 @@ export default function DatasetDashboardPage() {
     } catch (error) {
       console.error('Error deleting dataset:', error);
       toast.error('Failed to delete dataset');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   }, [datasetId, router]);
 
@@ -354,7 +366,7 @@ export default function DatasetDashboardPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleDelete}
+            onClick={() => setShowDeleteModal(true)}
             className="gap-2 border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
           >
             <Trash2 className="h-4 w-4" />
@@ -398,34 +410,24 @@ export default function DatasetDashboardPage() {
         </div>
       </details>
 
-      {/* Tabs for Charts and Table */}
-      <Tabs defaultValue="charts" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="charts">Charts</TabsTrigger>
-          <TabsTrigger value="table">Data Table</TabsTrigger>
-        </TabsList>
+      {/* Charts Section */}
+      <ChartContainer data={filteredData} columns={csvData.columns} />
 
-        <TabsContent value="charts" className="space-y-4">
-          <ChartContainer data={filteredData} columns={csvData.columns} />
-        </TabsContent>
-
-        <TabsContent value="table">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Data Table</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <EditableTable
-                data={filteredData}
-                columns={csvData.columns}
-                datasetId={datasetId}
-                rowIds={filteredRowIds}
-                onDataChange={refreshData}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      {/* Data Table Section - Separate section below charts */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Data Table</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EditableTable
+            data={filteredData}
+            columns={csvData.columns}
+            datasetId={datasetId}
+            rowIds={filteredRowIds}
+            onDataChange={refreshData}
+          />
+        </CardContent>
+      </Card>
 
       {/* Data Cleaner Modal */}
       <DataCleanerModal
@@ -435,6 +437,49 @@ export default function DatasetDashboardPage() {
         columns={csvData.columns}
         onCleanComplete={handleCleanComplete}
       />
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={showDeleteModal} onOpenChange={open => !isDeleting && setShowDeleteModal(open)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-2">
+              <AlertTriangle className="h-6 w-6 text-red-600" />
+            </div>
+            <DialogTitle className="text-center">Delete Report?</DialogTitle>
+            <DialogDescription className="text-center">
+              Are you sure you want to delete <span className="font-semibold">{dataset.name}</span>?
+              This will permanently remove all {dataset.rowCount.toLocaleString()} rows of data.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:justify-center mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteModal(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="gap-2"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -159,68 +159,122 @@ export default function DashboardPage() {
     );
   }
 
-  // Empty state - show big upload area
+  // Empty state - show dashboard with zero data and upload prompt
   if (datasets.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto py-12">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-100 mb-4">
-            <BarChart3 className="h-8 w-8 text-violet-600" />
+      <div className="space-y-6">
+        {/* Header with Upload Button */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <p className="text-muted-foreground">Upload a file to see your data insights</p>
           </div>
-          <h1 className="text-2xl font-bold mb-2">Welcome to Genius Board</h1>
-          <p className="text-muted-foreground">Upload your sales data to get started</p>
+          <div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,.xlsx,.xls"
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file);
+              }}
+              className="hidden"
+              disabled={uploading}
+            />
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              size="lg"
+              className="gap-2 bg-violet-600 hover:bg-violet-700"
+              disabled={uploading}
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-5 w-5" />
+                  Upload File
+                </>
+              )}
+            </Button>
+          </div>
         </div>
 
+        {/* Empty KPI Cards */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { title: 'Total Sales', icon: '💰' },
+            { title: 'Total Orders', icon: '📦' },
+            { title: 'Total Quantity', icon: '📊' },
+            { title: 'Customers', icon: '👥' },
+          ].map((kpi, index) => (
+            <Card key={index} className="relative overflow-hidden">
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">{kpi.title}</p>
+                    <p className="text-2xl font-bold text-muted-foreground/50 mt-1">0</p>
+                  </div>
+                  <span className="text-2xl opacity-50">{kpi.icon}</span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Empty Charts Grid */}
+        <div className="grid gap-4 lg:grid-cols-2">
+          {/* Line Chart Placeholder */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base text-muted-foreground/70">Sales Over Time</CardTitle>
+            </CardHeader>
+            <CardContent className="h-70 flex flex-col items-center justify-center text-center">
+              <BarChart3 className="h-12 w-12 text-muted-foreground/30 mb-3" />
+              <p className="text-sm text-muted-foreground">Chart will appear here</p>
+            </CardContent>
+          </Card>
+
+          {/* Bar Chart Placeholder */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base text-muted-foreground/70">Top 10 by Value</CardTitle>
+            </CardHeader>
+            <CardContent className="h-70 flex flex-col items-center justify-center text-center">
+              <BarChart3 className="h-12 w-12 text-muted-foreground/30 mb-3" />
+              <p className="text-sm text-muted-foreground">Chart will appear here</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Empty Data Table */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base text-muted-foreground/70">Data Table</CardTitle>
+          </CardHeader>
+          <CardContent className="h-50 flex flex-col items-center justify-center text-center">
+            <FileSpreadsheet className="h-12 w-12 text-muted-foreground/30 mb-3" />
+            <p className="text-sm text-muted-foreground">Your data will appear here after upload</p>
+          </CardContent>
+        </Card>
+
+        {/* Drag and Drop Overlay */}
         <div
           className={`
-            border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer
-            ${
-              isDragging
-                ? 'border-violet-500 bg-violet-50 scale-[1.02]'
-                : 'border-gray-200 hover:border-violet-400 hover:bg-violet-50/50'
-            }
+            fixed inset-0 z-50 bg-violet-600/20 backdrop-blur-sm flex items-center justify-center transition-opacity
+            ${isDragging ? 'opacity-100' : 'opacity-0 pointer-events-none'}
           `}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
         >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv,.xlsx,.xls"
-            onChange={e => {
-              const file = e.target.files?.[0];
-              if (file) handleFileUpload(file);
-            }}
-            className="hidden"
-            disabled={uploading}
-          />
-
-          {uploading ? (
-            <div className="py-4">
-              <Loader2 className="h-12 w-12 mx-auto text-violet-600 animate-spin mb-4" />
-              <p className="text-lg font-medium text-violet-700">Uploading...</p>
-            </div>
-          ) : (
-            <>
-              <div className="w-20 h-20 mx-auto rounded-full bg-violet-100 flex items-center justify-center mb-6">
-                <Upload className="h-10 w-10 text-violet-600" />
-              </div>
-              <p className="text-xl font-medium mb-2">
-                {isDragging ? 'Drop your file here!' : 'Drop your file here'}
-              </p>
-              <p className="text-muted-foreground mb-6">or click to choose a file</p>
-              <div className="flex items-center justify-center gap-3">
-                <Badge variant="secondary" className="text-sm px-3 py-1">
-                  CSV
-                </Badge>
-                <Badge variant="secondary" className="text-sm px-3 py-1">
-                  Excel
-                </Badge>
-              </div>
-            </>
-          )}
+          <div className="bg-white rounded-2xl p-12 text-center shadow-2xl">
+            <Upload className="h-16 w-16 mx-auto text-violet-600 mb-4" />
+            <p className="text-xl font-semibold text-violet-700">Drop your file here!</p>
+            <p className="text-muted-foreground mt-2">CSV or Excel files</p>
+          </div>
         </div>
       </div>
     );

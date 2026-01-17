@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Languages, LayoutDashboard, LogOut, User } from 'lucide-react';
+import { Languages, LayoutDashboard, LogOut, User, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
@@ -49,6 +49,17 @@ export function Header() {
             <span className={cn('font-medium', language === 'mm' && 'font-pyidaungsu')}>
               {language === 'en' ? 'EN' : 'မြန်မာ'}
             </span>
+          </Button>
+
+          {/* My Reports Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push('/dashboard')}
+            className="gap-2"
+            title="My Reports"
+          >
+            <FolderOpen className="h-4 w-4" />
           </Button>
 
           {/* User Menu */}
